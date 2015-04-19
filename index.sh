@@ -9,7 +9,7 @@ while true; do
     --soft-exit) SOFT_EXIT=true; shift ;;
     -s)          SOFT_EXIT=true; shift ;;
     --name)      SERVICE_NAME="$2"; shift; shift ;;
-    --n)         SERVICE_NAME="$2"; shift; shift ;;
+    -n)          SERVICE_NAME="$2"; shift; shift ;;
     --help)      HELP=true; shift ;;
     -h)          HELP=true; shift ;;
     --port)      PORT="$2"; shift; shift ;;
