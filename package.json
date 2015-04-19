@@ -1,0 +1,21 @@
+{
+  "name": "taco-nginx",
+  "version": "0.0.0",
+  "description": "Bash script that runs a service and forwards a subdomain to it using nginx when it listens to $PORT",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "bin": {
+    "taco-nginx": "./index.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/taco-nginx.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/taco-nginx/issues"
+  },
+  "homepage": "https://github.com/mafintosh/taco-nginx"
+}
