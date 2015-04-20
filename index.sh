@@ -16,6 +16,8 @@ while true; do
     -p)          PORT="$2"; shift; shift ;;
     --version)   VERSION=true; shift ;;
     -v)          VERSION=true; shift ;;
+    --domain)    DOMAIN="$2"; shift; shift ;;
+    -d)          DOMAIN="$2"; shift; shift ;;
     *)           break ;;
   esac
 done
@@ -30,6 +32,7 @@ cat << EOF
 Usage: taco-nginx [run-opts] command arg1 ...
   --name, -n      [service-name]
   --port, -p      [port]
+  --domain,-d     [forward this domain]
   --soft-exit, -s [wait 5s when shutting down]
   --version, -v   [prints installed version]
 
@@ -44,6 +47,8 @@ if [ "$SERVICE_NAME" == "" ]; then
   printf "You need to specify a name using --name [name] or adding a package.json\n"
   exit 1
 fi
+
+[ "$DOMAIN" == "" ] DOMAIN=$SERVICE_NAME.*
 
 if [ ! -d /etc/nginx/conf.d ]; then
   printf "/etc/nginx/conf.d does not exist. Is nginx installed?\n"
@@ -63,7 +68,7 @@ upstream $SERVICE_NAME {
 }
 server {
   listen 80;
-  server_name $SERVICE_NAME.*;
+  server_name $DOMAIN;
   location / {
     proxy_pass http://$SERVICE_NAME;
     proxy_set_header X-Forwarded-For \$remote_addr;
