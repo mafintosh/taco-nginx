@@ -48,7 +48,7 @@ if [ "$SERVICE_NAME" == "" ]; then
   exit 1
 fi
 
-[ "$DOMAIN" == "" ] DOMAIN=$SERVICE_NAME.*
+[ "$DOMAIN" == "" ] && DOMAIN=$SERVICE_NAME.*
 
 if [ ! -d /etc/nginx/conf.d ]; then
   printf "/etc/nginx/conf.d does not exist. Is nginx installed?\n"
