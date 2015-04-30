@@ -26,7 +26,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.2.0\n"
+  printf "1.2.1\n"
   exit
 fi
 
@@ -53,7 +53,7 @@ if [ "$SERVICE_NAME" == "" ]; then
 fi
 
 [ "$DOMAIN" == "" ] && DOMAIN=$SERVICE_NAME.*
-[ -f "$SERVER_CONFIG" ] && SERVER_CONFIG_CONTENTS="$($SERVER_CONFIG)"
+[ -f "$SERVER_CONFIG" ] && SERVER_CONFIG_CONTENTS="$(cat $SERVER_CONFIG)"
 
 if [ ! -d /etc/nginx/conf.d ]; then
   printf "/etc/nginx/conf.d does not exist. Is nginx installed?\n"
