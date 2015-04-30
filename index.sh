@@ -28,7 +28,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.4.0 \n"
+  printf "1.4.1 \n"
   exit
 fi
 
@@ -82,7 +82,7 @@ server {
     proxy_pass http://$SERVICE_NAME;
     proxy_set_header X-Forwarded-For \$remote_addr;
     proxy_buffering off;
-    proxy_request_buffering: off;
+    proxy_request_buffering off;
     proxy_http_version 1.1;
     $LOCATION_CONFIG_CONTENTS
   }
