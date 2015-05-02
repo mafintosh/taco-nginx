@@ -76,6 +76,7 @@ upstream $SERVICE_NAME {
   server 127.0.0.1:$PORT;
 }
 server {
+  listen 443;
   listen 80;
   server_name $DOMAIN;
   location / {
@@ -99,6 +100,7 @@ EOF
 }
 
 trap on_exit SIGTERM
+PATH="node_modules/.bin;$PATH"
 
 "$@" &
 PID=$!
