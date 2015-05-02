@@ -96,6 +96,7 @@ server {
     proxy_buffering off;
     proxy_request_buffering off;
     proxy_http_version 1.1;
+    client_max_body_size 0;
     $LOCATION_CONFIG_CONTENTS
   }
   $SERVER_CONFIG_CONTENTS
