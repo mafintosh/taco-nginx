@@ -32,7 +32,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.6.1\n"
+  printf "1.6.2\n"
   exit
 fi
 
@@ -72,8 +72,8 @@ fi
 
 LISTEN_HTTPS="listen 443;"
 LISTEN_HTTP="listen 80;"
-HTTPS_ONLY && LISTEN_HTTP=""
-HTTP_ONLY && LISTEN_HTTPS=""
+$HTTPS_ONLY && LISTEN_HTTP=""
+$HTTP_ONLY && LISTEN_HTTPS=""
 
 on_exit () {
   $SOFT_EXIT && sleep 5
