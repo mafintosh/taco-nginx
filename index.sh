@@ -32,7 +32,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.6.2\n"
+  printf "1.6.3\n"
   exit
 fi
 
@@ -111,7 +111,7 @@ EOF
 }
 
 trap on_exit SIGTERM
-PATH="node_modules/.bin;$PATH"
+PATH="node_modules/.bin:$PATH"
 
 "$@" &
 PID=$!
