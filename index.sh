@@ -3,6 +3,8 @@
 SOFT_EXIT=false
 HELP=false
 VERSION=false
+HTTP_ONLY = false
+HTTPS_ONLY = false
 
 while true; do
   case "$1" in
@@ -23,12 +25,14 @@ while true; do
     -c)                SERVER_CONFIG="$2"; shift; shift ;;
     --location-config) LOCATION_CONFIG="$2"; shift; shift ;;
     -l)                LOCATION_CONFIG="$2"; shift; shift ;;
+    --http-only)       HTTP_ONLY=true; shift ;;
+    --https-only)      HTTPS_ONLY=true; shift ;;
     *)                 break ;;
   esac
 done
 
 if $VERSION; then
-  printf "1.5.0\n"
+  printf "1.6.0\n"
   exit
 fi
 
@@ -41,6 +45,8 @@ Usage: taco-nginx [run-opts] command arg1 ...
   --server-config,-c   [add this file to the server config]
   --location-config,-l [add this file to the location config]
   --soft-exit, -s      [wait 5s when shutting down]
+  --http-only          [only listen on 80]
+  --https-only         [only listen on 443]
   --version, -v        [prints installed version]
 
 EOF
@@ -64,6 +70,10 @@ if [ ! -d /etc/nginx/conf.d ]; then
   exit 2
 fi
 
+EXTERNAL_PORTS="listen 443;\n  listen 80\n;"
+HTTPS_ONLY && EXTERNAL_PORTS = "listen 443;\n"
+HTTP_ONLY && EXTERNAL_PORTS = "listen 80;\n"
+
 on_exit () {
   $SOFT_EXIT && sleep 5
   kill $PID
@@ -76,8 +86,7 @@ upstream $SERVICE_NAME {
   server 127.0.0.1:$PORT;
 }
 server {
-  listen 443;
-  listen 80;
+  $EXTERNAL_PORTS
   server_name $DOMAIN;
   location / {
     proxy_pass http://$SERVICE_NAME;
