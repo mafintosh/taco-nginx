@@ -32,7 +32,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.6.3\n"
+  printf "1.7.0\n"
   exit
 fi
 
