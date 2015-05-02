@@ -3,8 +3,8 @@
 SOFT_EXIT=false
 HELP=false
 VERSION=false
-HTTP_ONLY = false
-HTTPS_ONLY = false
+HTTP_ONLY=false
+HTTPS_ONLY=false
 
 while true; do
   case "$1" in
@@ -32,7 +32,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.6.0\n"
+  printf "1.6.1\n"
   exit
 fi
 
@@ -70,9 +70,10 @@ if [ ! -d /etc/nginx/conf.d ]; then
   exit 2
 fi
 
-EXTERNAL_PORTS="listen 443;\n  listen 80\n;"
-HTTPS_ONLY && EXTERNAL_PORTS = "listen 443;\n"
-HTTP_ONLY && EXTERNAL_PORTS = "listen 80;\n"
+LISTEN_HTTPS="listen 443;"
+LISTEN_HTTP="listen 80;"
+HTTPS_ONLY && LISTEN_HTTP=""
+HTTP_ONLY && LISTEN_HTTPS=""
 
 on_exit () {
   $SOFT_EXIT && sleep 5
@@ -86,7 +87,8 @@ upstream $SERVICE_NAME {
   server 127.0.0.1:$PORT;
 }
 server {
-  $EXTERNAL_PORTS
+  $LISTEN_HTTPS
+  $LISTEN_HTTP
   server_name $DOMAIN;
   location / {
     proxy_pass http://$SERVICE_NAME;
