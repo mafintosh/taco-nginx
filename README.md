@@ -6,6 +6,14 @@ Bash script that runs a service and forwards a subdomain to it using nginx when 
 npm install -g taco-nginx
 ```
 
+We recommend using latest stable nginx (>1.8.0). If you are on Ubuntu LTS for example you may need to do this:
+
+```
+add-apt-repository ppa:nginx/stable
+apt-get update
+apt-get install nginx
+```
+
 ## Usage
 
 First write a service (in any language) similar to this
