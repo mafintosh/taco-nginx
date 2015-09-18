@@ -75,10 +75,15 @@ LISTEN_HTTP="listen 80;"
 $HTTPS_ONLY && LISTEN_HTTP=""
 $HTTP_ONLY && LISTEN_HTTPS=""
 
-on_exit () {
+on_sigterm () {
   $SOFT_EXIT && sleep 5
   kill $PID
   wait $PID
+}
+
+on_exit () {
+  $SUDO_MAYBE rm -f /etc/nginx/conf.d/$SERVICE_NAME.conf
+  $SUDO_MAYBE nginx -s reload
 }
 
 on_ready () {
@@ -106,12 +111,13 @@ EOF
   [ ! -O /etc/nginx/conf.d ] && SUDO_MAYBE=sudo
   $SUDO_MAYBE mv /tmp/nginx.$SERVICE_NAME.$PORT.conf /etc/nginx/conf.d/$SERVICE_NAME.conf
   $SUDO_MAYBE nginx -s reload
+  trap on_exit EXIT
 
   wait $PID
   exit $?
 }
 
-trap on_exit SIGTERM
+trap on_sigterm SIGTERM
 PATH="node_modules/.bin:$PATH"
 
 "$@" &
