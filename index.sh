@@ -25,6 +25,8 @@ while true; do
     -c)                SERVER_CONFIG="$2"; shift; shift ;;
     --location-config) LOCATION_CONFIG="$2"; shift; shift ;;
     -l)                LOCATION_CONFIG="$2"; shift; shift ;;
+    --http-port)       HTTP_PORT=$2; shift; shift ;;
+    --https-port)      HTTPS_PORT=$2; shift; shift ;;
     --http-only)       HTTP_ONLY=true; shift ;;
     --https-only)      HTTPS_ONLY=true; shift ;;
     *)                 break ;;
@@ -32,7 +34,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.7.0\n"
+  printf "1.7.1\n"
   exit
 fi
 
@@ -45,8 +47,10 @@ Usage: taco-nginx [run-opts] command arg1 ...
   --server-config,-c   [add this file to the server config]
   --location-config,-l [add this file to the location config]
   --soft-exit, -s      [wait 5s when shutting down]
-  --http-only          [only listen on 80]
-  --https-only         [only listen on 443]
+  --http-only          [only listen on http port]
+  --https-only         [only listen on https port]
+  --http-port          [default: 80]
+  --https-port         [default: 443]
   --version, -v        [prints installed version]
 
 EOF
@@ -70,8 +74,8 @@ if [ ! -d /etc/nginx/conf.d ]; then
   exit 2
 fi
 
-LISTEN_HTTPS="listen 443;"
-LISTEN_HTTP="listen 80;"
+LISTEN_HTTPS="listen $HTTPS_PORT;"
+LISTEN_HTTP="listen $HTTP_PORT;"
 $HTTPS_ONLY && LISTEN_HTTP=""
 $HTTP_ONLY && LISTEN_HTTPS=""
 
