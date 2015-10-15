@@ -3,6 +3,8 @@
 SOFT_EXIT=false
 HELP=false
 VERSION=false
+HTTP_PORT=80
+HTTPS_PORT=443
 HTTP_ONLY=false
 HTTPS_ONLY=false
 
