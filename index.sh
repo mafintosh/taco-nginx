@@ -38,7 +38,7 @@ while true; do
 done
 
 if $VERSION; then
-  printf "1.9.2\n"
+  printf "1.10.0\n"
   exit
 fi
 
