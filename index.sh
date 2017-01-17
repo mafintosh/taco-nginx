@@ -112,7 +112,7 @@ server {
   $SERVER_CONFIG_CONTENTS
   location / {
     $AUTO_INDEX
-    root $SERVE_STATIC;
+    root $(realpath "$SERVE_STATIC");
   }
 }
 EOF
