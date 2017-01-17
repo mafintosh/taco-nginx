@@ -31,6 +31,8 @@ while true; do
     --https-port)      HTTPS_PORT=$2; shift; shift ;;
     --http-only)       HTTP_ONLY=true; shift ;;
     --https-only)      HTTPS_ONLY=true; shift ;;
+    --static)          SERVE_STATIC="$2"; shift; shift ;;
+    --autoindex)       AUTO_INDEX="autoindex on;"; shift ;;
     *)                 break ;;
   esac
 done
@@ -40,7 +42,7 @@ if $VERSION; then
   exit
 fi
 
-if $HELP || [ "$1" == "" ]; then
+if $HELP || [ "$1$SERVE_STATIC" == "" ]; then
 cat << EOF
 Usage: taco-nginx [run-opts] command arg1 ...
   --name, -n           [service-name]
@@ -53,6 +55,8 @@ Usage: taco-nginx [run-opts] command arg1 ...
   --https-only         [only listen on https port]
   --http-port          [default: 80]
   --https-port         [default: 443]
+  --static             [path/to/folder to serve statically]
+  --autoindex          [serve file listing when using --static]
   --version, -v        [prints installed version]
 
 EOF
@@ -81,6 +85,13 @@ LISTEN_HTTP="listen $HTTP_PORT;"
 $HTTPS_ONLY && LISTEN_HTTP=""
 $HTTP_ONLY && LISTEN_HTTPS=""
 
+reload_nginx () {
+  [ ! -O /etc/nginx/conf.d ] && SUDO_MAYBE=sudo
+  $SUDO_MAYBE mv /tmp/nginx.$SERVICE_NAME.$PORT.conf /etc/nginx/conf.d/$SERVICE_NAME.conf
+  $SUDO_MAYBE nginx -s reload
+  trap on_exit EXIT
+}
+
 on_sigterm () {
   $SOFT_EXIT && sleep 5
   kill $PID
@@ -90,6 +101,25 @@ on_sigterm () {
 on_exit () {
   $SUDO_MAYBE rm -f /etc/nginx/conf.d/$SERVICE_NAME.conf
   $SUDO_MAYBE nginx -s reload
+}
+
+on_static () {
+cat << EOF > /tmp/nginx.$SERVICE_NAME.$PORT.conf
+server {
+  $LISTEN_HTTPS
+  $LISTEN_HTTP
+  server_name $DOMAIN;
+  $SERVER_CONFIG_CONTENTS
+  location / {
+    $AUTO_INDEX
+    root $SERVE_STATIC;
+  }
+}
+EOF
+
+  reload_nginx
+  cat - >/dev/null
+  exit $?
 }
 
 on_ready () {
@@ -114,24 +144,24 @@ server {
 }
 EOF
 
-  [ ! -O /etc/nginx/conf.d ] && SUDO_MAYBE=sudo
-  $SUDO_MAYBE mv /tmp/nginx.$SERVICE_NAME.$PORT.conf /etc/nginx/conf.d/$SERVICE_NAME.conf
-  $SUDO_MAYBE nginx -s reload
-  trap on_exit EXIT
-
+  reload_nginx
   wait $PID
   exit $?
 }
 
-trap on_sigterm SIGTERM
-PATH="node_modules/.bin:$PATH"
+if [ "$SERVE_STATIC" != "" ]; then
+  on_static
+else
+  trap on_sigterm SIGTERM
+  PATH="node_modules/.bin:$PATH"
 
-"$@" &
-PID=$!
+  "$@" &
+  PID=$!
 
-for i in {1..20}; do
-  lsof -p $PID 2>/dev/null | grep "TCP \*:$PORT" 2>/dev/null >/dev/null && on_ready
-  sleep 0.2
-done;
+  for i in {1..20}; do
+    lsof -p $PID 2>/dev/null | grep "TCP \*:$PORT" 2>/dev/null >/dev/null && on_ready
+    sleep 0.2
+  done;
 
-on_ready
+  on_ready
+fi
