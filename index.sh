@@ -42,7 +42,7 @@ done
 
 
 if $VERSION; then
-  printf "1.10.0\n"
+  printf "1.11.0\n"
   exit
 fi
 
