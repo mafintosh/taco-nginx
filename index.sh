@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SOFT_EXIT=false
+ENABLE_WEBSOCKETS=false
 HELP=false
 VERSION=false
 HTTP_PORT=80
@@ -33,13 +34,21 @@ while true; do
     --https-only)      HTTPS_ONLY=true; shift ;;
     --static)          SERVE_STATIC="$2"; shift; shift ;;
     --autoindex)       AUTO_INDEX="autoindex on;"; shift ;;
+    --websockets)      ENABLE_WEBSOCKETS=true; shift ;;
+    -w)                ENABLE_WEBSOCKETS=true; shift ;;
     *)                 break ;;
   esac
 done
 
+
 if $VERSION; then
   printf "1.10.0\n"
   exit
+fi
+
+if $ENABLE_WEBSOCKETS; then
+  WEBSOCKETS_LINE_1="proxy_set_header Upgrade \$http_upgrade;"
+  WEBSOCKETS_LINE_2="proxy_set_header Connection \"upgrade\";"
 fi
 
 if $HELP || [ "$1$SERVE_STATIC" == "" ]; then
@@ -57,6 +66,7 @@ Usage: taco-nginx [run-opts] command arg1 ...
   --https-port         [default: 443]
   --static             [path/to/folder to serve statically]
   --autoindex          [serve file listing when using --static]
+  --websockets,w       [enable websocket support]
   --version, -v        [prints installed version]
 
 EOF
@@ -74,6 +84,7 @@ fi
 [ "$DOMAIN" == "" ] && DOMAIN=$SERVICE_NAME.*
 [ -f "$SERVER_CONFIG" ] && SERVER_CONFIG_CONTENTS="$(cat $SERVER_CONFIG)"
 [ -f "$LOCATION_CONFIG" ] && LOCATION_CONFIG_CONTENTS="$(cat $LOCATION_CONFIG)"
+[ ""]
 
 if [ ! -d /etc/nginx/conf.d ]; then
   printf "/etc/nginx/conf.d does not exist. Is nginx installed?\n"
@@ -139,6 +150,8 @@ server {
     proxy_http_version 1.1;
     client_max_body_size 0;
     $LOCATION_CONFIG_CONTENTS
+    $WEBSOCKETS_LINE_1
+    $WEBSOCKETS_LINE_2
   }
   $SERVER_CONFIG_CONTENTS
 }
