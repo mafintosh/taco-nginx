@@ -1,6 +1,6 @@
 {
   "name": "taco-nginx",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "description": "Bash script that runs a service and forwards a subdomain to it using nginx when it listens to $PORT",
   "main": "index.js",
   "dependencies": {},
