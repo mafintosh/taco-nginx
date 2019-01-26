@@ -42,7 +42,7 @@ done
 
 
 if $VERSION; then
-  printf "1.12.0\n"
+  printf "1.12.1\n"
   exit
 fi
 
@@ -129,7 +129,7 @@ server {
 EOF
 
   reload_nginx
-  cat - >/dev/null
+  tail -f /dev/null
   exit $?
 }
 
